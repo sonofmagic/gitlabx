@@ -31,6 +31,10 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
+  "bin": {
+    "gitlabx": "./dist/index.cjs",
+    "gbx": "./dist/index.cjs"
+  },
   "files": [
     "dist"
   ],
