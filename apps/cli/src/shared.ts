@@ -1,13 +1,13 @@
 import type { AcceptMergeRequestOptions, AllMergeRequestsOptions } from '@gitbeaker/rest'
 
-import type { ResolvedProfile } from './config.js'
+import type { ResolvedProfile } from './config'
 import { Buffer } from 'node:buffer'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { Gitlab } from '@gitbeaker/rest'
-import { maybeBootstrapGlobalConfig } from './bootstrap.js'
-import { resolveGitlabConfig, resolveGitlabProfiles } from './config.js'
+import { maybeBootstrapGlobalConfig } from './bootstrap'
+import { resolveGitlabConfig, resolveGitlabProfiles } from './config'
 
 export interface BaseOptions {
   projectId?: string

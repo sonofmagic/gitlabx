@@ -1,8 +1,8 @@
-import type { ProfileSummary } from '../profile-store.js'
+import type { ProfileSummary } from '../profile-store'
 import { Gitlab } from '@gitbeaker/rest'
 import { input as promptInput, select as promptSelect } from '@inquirer/prompts'
 import pc from 'picocolors'
-import { logger } from '../logger.js'
+import { logger } from '../logger'
 import {
   deleteProfile,
   listProfiles,
@@ -11,8 +11,8 @@ import {
   saveProfileStore,
   setDefaultProfile,
   upsertProfile,
-} from '../profile-store.js'
-import { promptYesNo, runPromptWithEsc, selectFromPagedList } from './prompt-helpers.js'
+} from '../profile-store'
+import { promptYesNo, runPromptWithEsc, selectFromPagedList } from './prompt-helpers'
 
 function slugifyProfileName(source: string) {
   return source.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'profile'

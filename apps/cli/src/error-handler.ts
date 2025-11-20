@@ -1,6 +1,6 @@
 import process from 'node:process'
-import { logger } from './logger.js'
-import { isGitbeakerError } from './shared.js'
+import { logger } from './logger'
+import { isGitbeakerError } from './shared'
 
 export function handleCliError(error: unknown) {
   if (isGitbeakerError(error)) {

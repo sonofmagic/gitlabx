@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import process from 'node:process'
 import { loadConfig } from 'c12'
-import { getGlobalConfigPath } from './bootstrap.js'
+import { getGlobalConfigPath } from './bootstrap'
 
 export interface GitlabConfigInput {
   projectId?: string

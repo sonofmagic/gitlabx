@@ -1,7 +1,7 @@
-import type { FavoriteProjectRecord } from '../favorites.js'
-import type { MergeRequestSummary } from '../shared.js'
+import type { FavoriteProjectRecord } from '../favorites'
+import type { MergeRequestSummary } from '../shared'
 import pc from 'picocolors'
-import { favoriteKey } from '../favorites.js'
+import { favoriteKey } from '../favorites'
 
 export interface InteractiveProjectChoice {
   projectRef: string

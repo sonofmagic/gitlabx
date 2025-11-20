@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { getGlobalConfigPath } from './bootstrap.js'
+import { getGlobalConfigPath } from './bootstrap'
 
 export interface FavoriteProjectRecord {
   projectRef: string

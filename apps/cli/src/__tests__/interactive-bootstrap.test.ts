@@ -3,7 +3,7 @@ import path from 'node:path'
 // @vitest-environment node
 import { Command } from 'commander'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { getGlobalConfigPath } from '../bootstrap.js'
+import { getGlobalConfigPath } from '../bootstrap'
 
 function setupTempHome() {
   const base = path.resolve(__dirname, '../../.tmp-tests')
@@ -47,7 +47,7 @@ describe('interactive bootstrap', () => {
       env: process.env,
     }))
 
-    const { registerProfileCommand } = await import('../commands/profile.js')
+    const { registerProfileCommand } = await import('../commands/profile')
     const program = new Command().name('gitlab-cli-test')
     registerProfileCommand(program)
     await program.parseAsync(['profile', 'use'], { from: 'user' })

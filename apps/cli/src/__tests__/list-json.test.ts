@@ -33,8 +33,8 @@ describe('list --json aggregation', () => {
       },
       env: process.env,
     }))
-    vi.doMock('../shared.js', async () => {
-      const actual = await vi.importActual<any>('../shared.js')
+    vi.doMock('../shared', async () => {
+      const actual = await vi.importActual<any>('../shared')
       return {
         ...actual,
         createGitlabSdksForProfiles: vi.fn(async () => ([
@@ -53,7 +53,7 @@ describe('list --json aggregation', () => {
         ])),
       }
     })
-    const { registerListCommand } = await import('../commands/list.js')
+    const { registerListCommand } = await import('../commands/list')
     const program = createProgram()
     registerListCommand(program)
 
@@ -86,8 +86,8 @@ describe('list --json aggregation', () => {
       },
       env: process.env,
     }))
-    vi.doMock('../shared.js', async () => {
-      const actual = await vi.importActual<any>('../shared.js')
+    vi.doMock('../shared', async () => {
+      const actual = await vi.importActual<any>('../shared')
       return {
         ...actual,
         createGitlabSdksForProfiles: vi.fn(async () => ([
@@ -112,7 +112,7 @@ describe('list --json aggregation', () => {
         ])),
       }
     })
-    const { registerListCommand } = await import('../commands/list.js')
+    const { registerListCommand } = await import('../commands/list')
     const program = createProgram()
     registerListCommand(program)
 

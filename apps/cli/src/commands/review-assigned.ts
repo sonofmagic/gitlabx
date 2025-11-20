@@ -1,13 +1,13 @@
 import type { Gitlab } from '@gitbeaker/rest'
 import type { Command } from 'commander'
-import type { MergeRequestSummary, ReviewAssignedCommandOptions } from '../shared.js'
-import { logger } from '../logger.js'
-import { withProjectOptions } from '../project-options.js'
+import type { MergeRequestSummary, ReviewAssignedCommandOptions } from '../shared'
+import { logger } from '../logger'
+import { withProjectOptions } from '../project-options'
 import {
   buildListFetchOptions,
   createGitlabSdksForProfiles,
   DEFAULT_COMMENT_BODY,
-} from '../shared.js'
+} from '../shared'
 
 interface GitlabUser {
   id?: number

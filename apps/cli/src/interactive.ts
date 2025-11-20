@@ -1,23 +1,23 @@
-import type { FavoriteProjectRecord } from './favorites.js'
-import type { InteractiveProjectChoice, MergeRequestRecord } from './interactive/helpers.js'
+import type { FavoriteProjectRecord } from './favorites'
+import type { InteractiveProjectChoice, MergeRequestRecord } from './interactive/helpers'
 import process from 'node:process'
 import pc from 'picocolors'
-import { runCommentWorkflow } from './commands/comment.js'
-import { runMergeWorkflow } from './commands/merge.js'
+import { runCommentWorkflow } from './commands/comment'
+import { runMergeWorkflow } from './commands/merge'
 import {
   favoriteKey,
 
   loadFavoriteProjects,
   saveFavoriteProjects,
-} from './favorites.js'
+} from './favorites'
 import {
   buildFavoriteChoiceList,
   buildProjectOptions,
 
   markFavoriteState,
 
-} from './interactive/helpers.js'
-import { launchProfileManager } from './interactive/profile-manager.js'
+} from './interactive/helpers'
+import { launchProfileManager } from './interactive/profile-manager'
 import {
   promptCommentBody,
   promptProjectSelection,
@@ -25,10 +25,10 @@ import {
   promptRepoListMode,
   promptYesNo,
   selectFromPagedList,
-} from './interactive/prompt-helpers.js'
-import { logger } from './logger.js'
-import { listProfiles, loadProfileStore } from './profile-store.js'
-import { createGitlabSdksForProfiles, DEFAULT_COMMENT_BODY } from './shared.js'
+} from './interactive/prompt-helpers'
+import { logger } from './logger'
+import { listProfiles, loadProfileStore } from './profile-store'
+import { createGitlabSdksForProfiles, DEFAULT_COMMENT_BODY } from './shared'
 
 interface GitlabProjectSummary {
   id?: number

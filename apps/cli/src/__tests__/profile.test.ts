@@ -3,8 +3,8 @@ import path from 'node:path'
 // @vitest-environment node
 import { Command } from 'commander'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { getGlobalConfigPath } from '../bootstrap.js'
-import { registerProfileCommand } from '../commands/profile.js'
+import { getGlobalConfigPath } from '../bootstrap'
+import { registerProfileCommand } from '../commands/profile'
 
 function setupTempHome() {
   // Ensure temp dir is inside workspace to satisfy sandbox write constraints

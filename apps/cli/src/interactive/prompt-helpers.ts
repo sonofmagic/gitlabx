@@ -1,10 +1,10 @@
-import type { InteractiveProjectChoice } from './helpers.js'
+import type { InteractiveProjectChoice } from './helpers'
 import process, { stdin as input, stdout as output } from 'node:process'
 import readline from 'node:readline'
 import { confirm as promptConfirm, input as promptInput, select as promptSelect } from '@inquirer/prompts'
 import pc from 'picocolors'
-import { logger } from '../logger.js'
-import { formatProjectLine } from './helpers.js'
+import { logger } from '../logger'
+import { formatProjectLine } from './helpers'
 
 const PAGER_HELP_TEXT = '↑/↓ move  ·  ←/→ change page  ·  1-9 quick select  ·  Enter confirm  ·  Esc cancel'
 const DEFAULT_PAGE_SIZE = 10

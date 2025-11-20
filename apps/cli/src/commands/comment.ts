@@ -1,9 +1,9 @@
 import type { Command } from 'commander'
-import type { CommentCommandOptions } from '../shared.js'
+import type { CommentCommandOptions } from '../shared'
 
-import { logger } from '../logger.js'
-import { withProjectOptions } from '../project-options.js'
-import { createGitlabSdksForProfiles, parseMergeRequestIid, resolveCommentBody } from '../shared.js'
+import { logger } from '../logger'
+import { withProjectOptions } from '../project-options'
+import { createGitlabSdksForProfiles, parseMergeRequestIid, resolveCommentBody } from '../shared'
 
 export async function runCommentWorkflow(options: CommentCommandOptions) {
   const mrIid = parseMergeRequestIid(options.mr)

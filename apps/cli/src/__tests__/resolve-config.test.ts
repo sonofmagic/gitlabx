@@ -39,7 +39,7 @@ describe('resolveGitlabProfiles precedence', () => {
 
   it('CLI options override config and env', async () => {
     setupTempCwd()
-    const { resolveGitlabProfiles } = await import('../config.js')
+    const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({
       token: 'cli-token',
       projectId: '333',
@@ -59,7 +59,7 @@ describe('resolveGitlabProfiles precedence', () => {
       projectId: '111',
       baseUrl: 'https://conf.example.com',
     }, null, 2)}\n`)
-    const { resolveGitlabProfiles } = await import('../config.js')
+    const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({})
     expect(profiles).toHaveLength(1)
     expect(profiles[0].token).toBe('conf-token')
@@ -75,7 +75,7 @@ describe('resolveGitlabProfiles precedence', () => {
     process.env.GITLAB_B_TOKEN = 'token-b'
     process.env.GITLAB_B_PROJECT_PATH = 'group/b'
     // default base url
-    const { resolveGitlabProfiles } = await import('../config.js')
+    const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({ allProfiles: true })
     expect(profiles).toHaveLength(2)
     const names = profiles.map(p => p.name)
@@ -103,7 +103,7 @@ describe('resolveGitlabProfiles precedence', () => {
         },
       },
     }, null, 2)}\n`)
-    const { resolveGitlabProfiles } = await import('../config.js')
+    const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({ profile: 'teamA', projectId: '999' })
     expect(profiles).toHaveLength(1)
     expect(profiles[0].token).toBe('token-a')
@@ -116,7 +116,7 @@ describe('resolveGitlabProfiles precedence', () => {
     writeFileSync(configPath, `${JSON.stringify({
       token: 'only-token',
     }, null, 2)}\n`)
-    const { resolveGitlabProfiles } = await import('../config.js')
+    const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({}, { requireProject: false })
     expect(profiles).toHaveLength(1)
     expect(profiles[0].token).toBe('only-token')
@@ -136,7 +136,7 @@ describe('resolveGitlabProfiles precedence', () => {
       projectId: '555',
       baseUrl: 'https://global.example.com',
     }, null, 2)}\n`)
-    const { resolveGitlabProfiles } = await import('../config.js')
+    const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({})
     expect(profiles).toHaveLength(1)
     expect(profiles[0].token).toBe('global-token')
@@ -149,7 +149,7 @@ describe('resolveGitlabProfiles precedence', () => {
     process.env.GITLAB_TOKEN = 'env-token'
     delete process.env.GITLAB_PROJECT_ID
     delete process.env.GITLAB_PROJECT_PATH
-    const { resolveGitlabProfiles } = await import('../config.js')
+    const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({}, { requireProject: false })
     expect(profiles).toHaveLength(1)
     expect(profiles[0].token).toBe('env-token')

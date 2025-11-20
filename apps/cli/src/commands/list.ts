@@ -1,16 +1,16 @@
 import type { Command } from 'commander'
-import type { ListCommandOptions } from '../shared.js'
+import type { ListCommandOptions } from '../shared'
 
 import process from 'node:process'
-import { logger } from '../logger.js'
-import { withProjectOptions } from '../project-options.js'
+import { logger } from '../logger'
+import { withProjectOptions } from '../project-options'
 import {
   applyMatchFilter,
   buildListFetchOptions,
   createGitlabSdksForProfiles,
   formatMergeRequestSummary,
   parseLimitOption,
-} from '../shared.js'
+} from '../shared'
 
 export function registerListCommand(program: Command) {
   return withProjectOptions(

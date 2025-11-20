@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import process from 'node:process'
 import { Command } from 'commander'
-import { registerCommentCommand } from './commands/comment.js'
-import { registerListCommand } from './commands/list.js'
-import { registerMergeCommand } from './commands/merge.js'
-import { registerProfileCommand } from './commands/profile.js'
-import { registerReviewAssignedCommand } from './commands/review-assigned.js'
-import { handleCliError } from './error-handler.js'
-import { launchInteractiveHome } from './interactive.js'
+import { registerCommentCommand } from './commands/comment'
+import { registerListCommand } from './commands/list'
+import { registerMergeCommand } from './commands/merge'
+import { registerProfileCommand } from './commands/profile'
+import { registerReviewAssignedCommand } from './commands/review-assigned'
+import { handleCliError } from './error-handler'
+import { launchInteractiveHome } from './interactive'
 
 const program = new Command()
 program

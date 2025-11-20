@@ -3,8 +3,8 @@ import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { stdin as input, stdout as output } from 'node:process'
 import { input as promptInput, select as promptSelect } from '@inquirer/prompts'
 import { loadConfig } from 'c12'
-import { getGlobalConfigPath } from '../bootstrap.js'
-import { logger } from '../logger.js'
+import { getGlobalConfigPath } from '../bootstrap'
+import { logger } from '../logger'
 
 interface ProfilesConfig {
   defaultProfile?: string

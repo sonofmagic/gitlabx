@@ -1,9 +1,9 @@
 import type { Command } from 'commander'
-import type { MergeCommandOptions } from '../shared.js'
+import type { MergeCommandOptions } from '../shared'
 
-import { logger } from '../logger.js'
-import { withProjectOptions } from '../project-options.js'
-import { buildMergeOptions, createGitlabSdksForProfiles, parseMergeRequestIid } from '../shared.js'
+import { logger } from '../logger'
+import { withProjectOptions } from '../project-options'
+import { buildMergeOptions, createGitlabSdksForProfiles, parseMergeRequestIid } from '../shared'
 
 export async function runMergeWorkflow(options: MergeCommandOptions) {
   const mrIid = parseMergeRequestIid(options.mr)

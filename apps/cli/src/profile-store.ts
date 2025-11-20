@@ -1,6 +1,6 @@
-import type { GitlabCliConfig, GitlabCliProfile } from './config.js'
+import type { GitlabCliConfig, GitlabCliProfile } from './config'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { getGlobalConfigPath } from './bootstrap.js'
+import { getGlobalConfigPath } from './bootstrap'
 
 export interface StoredProfile extends GitlabCliProfile {
   displayName?: string
