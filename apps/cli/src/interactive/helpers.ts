@@ -72,6 +72,36 @@ export function markFavoriteState(choices: InteractiveProjectChoice[], favoriteS
   })
 }
 
+function parseTimestamp(value?: string) {
+  if (!value) {
+    return 0
+  }
+  const time = Date.parse(value)
+  return Number.isNaN(time) ? 0 : time
+}
+
+export function sortFavoriteRecords(records: FavoriteProjectRecord[]) {
+  return [...records].sort((a, b) => {
+    const aUsed = parseTimestamp(a.lastUsedAt)
+    const bUsed = parseTimestamp(b.lastUsedAt)
+    if (aUsed !== bUsed) {
+      return bUsed - aUsed
+    }
+    const aActivity = parseTimestamp(a.lastActivity)
+    const bActivity = parseTimestamp(b.lastActivity)
+    if (aActivity !== bActivity) {
+      return bActivity - aActivity
+    }
+    const aLabel = a.label ?? a.projectRef
+    const bLabel = b.label ?? b.projectRef
+    const labelCompare = aLabel.localeCompare(bLabel)
+    if (labelCompare !== 0) {
+      return labelCompare
+    }
+    return a.projectRef.localeCompare(b.projectRef)
+  })
+}
+
 export function buildFavoriteChoiceList(
   records: FavoriteProjectRecord[],
   projects: InteractiveProjectChoice[],
@@ -88,13 +118,20 @@ export function buildFavoriteChoiceList(
       existing.isFavorite = true
       return existing
     }
-    return {
+    const choice: InteractiveProjectChoice = {
       projectRef: record.projectRef,
       label: record.label ?? record.projectRef,
-      profileName: record.profile ?? undefined,
-      lastActivity: record.lastActivity,
-      webUrl: record.webUrl,
       isFavorite: true,
     }
+    if (record.profile) {
+      choice.profileName = record.profile
+    }
+    if (record.lastActivity) {
+      choice.lastActivity = record.lastActivity
+    }
+    if (record.webUrl) {
+      choice.webUrl = record.webUrl
+    }
+    return choice
   })
 }

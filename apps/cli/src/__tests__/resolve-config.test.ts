@@ -20,8 +20,8 @@ function setupTempHome() {
     mkdirSync(base, { recursive: true })
   }
   const dir = mkdtempSync(path.join(base, 'home-'))
-  process.env.HOME = dir
-  process.env.XDG_CONFIG_HOME = path.join(dir, '.config')
+  process.env['HOME'] = dir
+  process.env['XDG_CONFIG_HOME'] = path.join(dir, '.config')
   return dir
 }
 
@@ -46,9 +46,10 @@ describe('resolveGitlabProfiles precedence', () => {
       baseUrl: 'https://cli.example.com',
     })
     expect(profiles).toHaveLength(1)
-    expect(profiles[0].token).toBe('cli-token')
-    expect(profiles[0].projectRef).toBe('333')
-    expect(profiles[0].baseUrl).toBe('https://cli.example.com')
+    const profile = profiles[0]
+    expect(profile?.token).toBe('cli-token')
+    expect(profile?.projectRef).toBe('333')
+    expect(profile?.baseUrl).toBe('https://cli.example.com')
   })
 
   it('config top-level used when no CLI and no env', async () => {
@@ -62,18 +63,19 @@ describe('resolveGitlabProfiles precedence', () => {
     const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({})
     expect(profiles).toHaveLength(1)
-    expect(profiles[0].token).toBe('conf-token')
-    expect(profiles[0].projectRef).toBe('111')
-    expect(profiles[0].baseUrl).toBe('https://conf.example.com')
+    const profile = profiles[0]
+    expect(profile?.token).toBe('conf-token')
+    expect(profile?.projectRef).toBe('111')
+    expect(profile?.baseUrl).toBe('https://conf.example.com')
   })
 
   it('env multi-profiles used when no CLI and no config', async () => {
     setupTempCwd()
-    process.env.GITLAB_PROFILES = 'A,B'
-    process.env.GITLAB_A_TOKEN = 'token-a'
-    process.env.GITLAB_A_PROJECT_ID = '100'
-    process.env.GITLAB_B_TOKEN = 'token-b'
-    process.env.GITLAB_B_PROJECT_PATH = 'group/b'
+    process.env['GITLAB_PROFILES'] = 'A,B'
+    process.env['GITLAB_A_TOKEN'] = 'token-a'
+    process.env['GITLAB_A_PROJECT_ID'] = '100'
+    process.env['GITLAB_B_TOKEN'] = 'token-b'
+    process.env['GITLAB_B_PROJECT_PATH'] = 'group/b'
     // default base url
     const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({ allProfiles: true })
@@ -106,8 +108,9 @@ describe('resolveGitlabProfiles precedence', () => {
     const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({ profile: 'teamA', projectId: '999' })
     expect(profiles).toHaveLength(1)
-    expect(profiles[0].token).toBe('token-a')
-    expect(profiles[0].projectRef).toBe('999')
+    const profile = profiles[0]
+    expect(profile?.token).toBe('token-a')
+    expect(profile?.projectRef).toBe('999')
   })
 
   it('resolves profile without project when requireProject=false', async () => {
@@ -119,8 +122,9 @@ describe('resolveGitlabProfiles precedence', () => {
     const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({}, { requireProject: false })
     expect(profiles).toHaveLength(1)
-    expect(profiles[0].token).toBe('only-token')
-    expect(profiles[0].projectRef).toBeUndefined()
+    const profile = profiles[0]
+    expect(profile?.token).toBe('only-token')
+    expect(profile?.projectRef).toBeUndefined()
   })
 
   it('falls back to ~/.config/gitlab-cli/config.json when no other config exists', async () => {
@@ -139,20 +143,22 @@ describe('resolveGitlabProfiles precedence', () => {
     const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({})
     expect(profiles).toHaveLength(1)
-    expect(profiles[0].token).toBe('global-token')
-    expect(profiles[0].projectRef).toBe('555')
-    expect(profiles[0].baseUrl).toBe('https://global.example.com')
+    const profile = profiles[0]
+    expect(profile?.token).toBe('global-token')
+    expect(profile?.projectRef).toBe('555')
+    expect(profile?.baseUrl).toBe('https://global.example.com')
   })
 
   it('loads env token without project when requireProject=false', async () => {
     setupTempCwd()
-    process.env.GITLAB_TOKEN = 'env-token'
-    delete process.env.GITLAB_PROJECT_ID
-    delete process.env.GITLAB_PROJECT_PATH
+    process.env['GITLAB_TOKEN'] = 'env-token'
+    delete process.env['GITLAB_PROJECT_ID']
+    delete process.env['GITLAB_PROJECT_PATH']
     const { resolveGitlabProfiles } = await import('../config')
     const profiles = await resolveGitlabProfiles({}, { requireProject: false })
     expect(profiles).toHaveLength(1)
-    expect(profiles[0].token).toBe('env-token')
-    expect(profiles[0].projectRef).toBeUndefined()
+    const profile = profiles[0]
+    expect(profile?.token).toBe('env-token')
+    expect(profile?.projectRef).toBeUndefined()
   })
 })

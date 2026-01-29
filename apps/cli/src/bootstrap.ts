@@ -13,7 +13,7 @@ interface ProfilesConfig {
 
 function isInteractive() {
   // Avoid prompting in CI or when stdin is not a TTY
-  return Boolean(input.isTTY && !process.env.CI)
+  return Boolean(input.isTTY && !process.env['CI'])
 }
 
 async function fileExists(p: string) {
@@ -28,8 +28,8 @@ async function fileExists(p: string) {
 
 export function getGlobalConfigPath() {
   // Respect XDG_CONFIG_HOME when available, otherwise default to ~/.config.
-  const configHome = process.env.XDG_CONFIG_HOME
-    ? path.resolve(process.env.XDG_CONFIG_HOME)
+  const configHome = process.env['XDG_CONFIG_HOME']
+    ? path.resolve(process.env['XDG_CONFIG_HOME'])
     : path.join(homedir(), '.config')
   const dir = path.join(configHome, 'gitlab-cli')
   const file = path.join(dir, 'config.json')

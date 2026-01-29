@@ -137,8 +137,11 @@ export function registerProfileCommand(program: Command) {
         const candidates = new Set<string>()
         const defaultBase = current.baseUrl || 'https://gitlab.com'
         candidates.add(defaultBase)
-        if (selectedProfile && current.profiles?.[selectedProfile]?.baseUrl) {
-          candidates.add(current.profiles[selectedProfile].baseUrl as string)
+        const profileBaseUrl = selectedProfile
+          ? current.profiles?.[selectedProfile]?.baseUrl
+          : undefined
+        if (profileBaseUrl) {
+          candidates.add(profileBaseUrl)
         }
         const unique = Array.from(candidates).map(trimBaseUrl).filter(Boolean)
         if (unique.length > 0) {

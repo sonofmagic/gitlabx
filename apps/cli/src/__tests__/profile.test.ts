@@ -13,7 +13,7 @@ function setupTempHome() {
     mkdirSync(base, { recursive: true })
   }
   const dir = mkdtempSync(path.join(base, 'home-'))
-  process.env.HOME = dir
+  process.env['HOME'] = dir
   return dir
 }
 

@@ -59,14 +59,22 @@ export function listProfiles(config: RawProfileStore): ProfileSummary[] {
     = entries.length === 0
       && (config.token || config.baseUrl || config.projectId || config.projectPath)
   if (hasFallback) {
+    const fallbackProfile: StoredProfile = {}
+    if (config.baseUrl) {
+      fallbackProfile.baseUrl = config.baseUrl
+    }
+    if (config.token) {
+      fallbackProfile.token = config.token
+    }
+    if (config.projectId) {
+      fallbackProfile.projectId = config.projectId
+    }
+    if (config.projectPath) {
+      fallbackProfile.projectPath = config.projectPath
+    }
     summaries.push({
       name: 'default',
-      profile: {
-        baseUrl: config.baseUrl,
-        token: config.token,
-        projectId: config.projectId,
-        projectPath: config.projectPath,
-      },
+      profile: fallbackProfile,
       isDefault: !defaultName || defaultName === 'default',
     })
   }
@@ -86,7 +94,13 @@ export function deleteProfile(config: RawProfileStore, name: string) {
   }
   delete config.profiles[name]
   if (config.defaultProfile === name) {
-    config.defaultProfile = Object.keys(config.profiles)[0]
+    const nextDefault = Object.keys(config.profiles)[0]
+    if (nextDefault) {
+      config.defaultProfile = nextDefault
+    }
+    else {
+      delete config.defaultProfile
+    }
   }
 }
 

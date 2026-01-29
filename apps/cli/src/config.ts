@@ -76,13 +76,13 @@ async function loadC12Config(): Promise<GitlabCliConfig> {
 
 export function resolveGitlabConfig(options: GitlabConfigInput): GitlabConfig {
   const baseUrl = normalize(options.baseUrl)
-    ?? normalize(process.env.GITLAB_BASE_URL)
+    ?? normalize(process.env['GITLAB_BASE_URL'])
     ?? 'https://gitlab.com'
-  const token = normalize(options.token) ?? normalize(process.env.GITLAB_TOKEN)
+  const token = normalize(options.token) ?? normalize(process.env['GITLAB_TOKEN'])
   const projectRef = normalize(options.projectId)
     ?? normalize(options.projectPath)
-    ?? normalize(process.env.GITLAB_PROJECT_ID)
-    ?? normalize(process.env.GITLAB_PROJECT_PATH)
+    ?? normalize(process.env['GITLAB_PROJECT_ID'])
+    ?? normalize(process.env['GITLAB_PROJECT_PATH'])
 
   if (!token) {
     throw new Error('Missing GitLab token. Provide --token or set GITLAB_TOKEN.')
@@ -131,6 +131,25 @@ interface ResolveProfilesOptions {
   requireProject?: boolean
 }
 
+function buildResolvedProfile(input: {
+  name?: string
+  baseUrl: string
+  token: string
+  projectRef?: string
+}): ResolvedProfile {
+  const resolved: ResolvedProfile = {
+    baseUrl: input.baseUrl,
+    token: input.token,
+  }
+  if (input.name) {
+    resolved.name = input.name
+  }
+  if (input.projectRef) {
+    resolved.projectRef = input.projectRef
+  }
+  return resolved
+}
+
 /**
  * Resolve one or multiple GitLab configs. Precedence:
  * 1) Explicit CLI overrides (--token/--project-id/--project-path/--base-url) -> single config
@@ -157,10 +176,10 @@ export async function resolveGitlabProfiles(
 
   // Determine requested profile names
   const requestedProfilesFromFlag = parseCsv(normalize(options.profile))
-  const requestedProfilesFromConfigDefault
-    = configuredProfiles.length > 0
-      ? [normalize(fileConfig.defaultProfile) ?? configuredProfiles[0]].filter(Boolean) as string[]
-      : []
+  const defaultProfileFromConfig = normalize(fileConfig.defaultProfile) ?? configuredProfiles[0]
+  const requestedProfilesFromConfigDefault = configuredProfiles.length > 0 && defaultProfileFromConfig
+    ? [defaultProfileFromConfig]
+    : []
 
   const requestedProfiles = options.allProfiles
     ? configuredProfiles
@@ -192,12 +211,12 @@ export async function resolveGitlabProfiles(
         throw new Error(`Missing project reference for profile "${name}" in config. Provide --project-id/--project-path to override.`)
       }
       const normalizedBaseUrl = baseUrl.replace(/\/+$/, '') || baseUrl
-      resolvedFromConfig.push({
+      resolvedFromConfig.push(buildResolvedProfile({
         name,
         baseUrl: normalizedBaseUrl,
         token,
-        projectRef,
-      })
+        ...(projectRef ? { projectRef } : {}),
+      }))
     }
     if (resolvedFromConfig.length > 0) {
       return resolvedFromConfig
@@ -213,16 +232,16 @@ export async function resolveGitlabProfiles(
     if (token && (projectRef || !requireProject)) {
       const normalizedBaseUrl = baseUrl.replace(/\/+$/, '') || baseUrl
       return [
-        {
+        buildResolvedProfile({
           baseUrl: normalizedBaseUrl,
           token,
-          projectRef,
-        },
+          ...(projectRef ? { projectRef } : {}),
+        }),
       ]
     }
   }
 
-  const profilesEnv = normalize(process.env.GITLAB_PROFILES)
+  const profilesEnv = normalize(process.env['GITLAB_PROFILES'])
   const declaredProfiles = parseCsv(profilesEnv)
 
   const requestedProfilesEnv = options.allProfiles
@@ -232,7 +251,8 @@ export async function resolveGitlabProfiles(
         if (fromFlag.length > 0) {
           return fromFlag
         }
-        return declaredProfiles.length > 0 ? [declaredProfiles[0]] : []
+        const firstDeclared = declaredProfiles[0]
+        return firstDeclared ? [firstDeclared] : []
       })()
 
   // If profiles are requested or declared, try to resolve via per-profile env vars
@@ -243,7 +263,7 @@ export async function resolveGitlabProfiles(
       const projectIdEnv = normalize(process.env[envKeyForProfile(name, 'PROJECT_ID')])
       const projectPathEnv = normalize(process.env[envKeyForProfile(name, 'PROJECT_PATH')])
       const baseUrl = normalize(process.env[envKeyForProfile(name, 'BASE_URL')])
-        ?? normalize(process.env.GITLAB_BASE_URL)
+        ?? normalize(process.env['GITLAB_BASE_URL'])
         ?? 'https://gitlab.com'
 
       if (!token) {
@@ -258,12 +278,12 @@ export async function resolveGitlabProfiles(
       }
 
       const normalizedBaseUrl = baseUrl.replace(/\/+$/, '') || baseUrl
-      resolved.push({
+      resolved.push(buildResolvedProfile({
         name,
         baseUrl: normalizedBaseUrl,
         token,
-        projectRef,
-      })
+        ...(projectRef ? { projectRef } : {}),
+      }))
     }
 
     if (resolved.length > 0) {
@@ -273,21 +293,21 @@ export async function resolveGitlabProfiles(
 
   // Fallback to legacy single-env resolution
   const baseUrl = normalize(options.baseUrl)
-    ?? normalize(process.env.GITLAB_BASE_URL)
+    ?? normalize(process.env['GITLAB_BASE_URL'])
     ?? 'https://gitlab.com'
-  const token = normalize(options.token) ?? normalize(process.env.GITLAB_TOKEN)
+  const token = normalize(options.token) ?? normalize(process.env['GITLAB_TOKEN'])
   const projectRef = projectOverride
-    ?? normalize(process.env.GITLAB_PROJECT_ID)
-    ?? normalize(process.env.GITLAB_PROJECT_PATH)
+    ?? normalize(process.env['GITLAB_PROJECT_ID'])
+    ?? normalize(process.env['GITLAB_PROJECT_PATH'])
 
   if (token && (projectRef || !requireProject)) {
     const normalizedBaseUrl = baseUrl.replace(/\/+$/, '') || baseUrl
     return [
-      {
+      buildResolvedProfile({
         baseUrl: normalizedBaseUrl,
         token,
-        projectRef,
-      },
+        ...(projectRef ? { projectRef } : {}),
+      }),
     ]
   }
 

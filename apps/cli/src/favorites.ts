@@ -8,6 +8,7 @@ export interface FavoriteProjectRecord {
   label?: string
   webUrl?: string
   lastActivity?: string
+  lastUsedAt?: string
 }
 
 const FAVORITES_FILE = path.join(getGlobalConfigPath().dir, 'favorites.json')
@@ -25,25 +26,36 @@ function normalizeFavoriteRecord(value: unknown): FavoriteProjectRecord | undefi
     return undefined
   }
   const record = value as Record<string, unknown>
-  if (typeof record.projectRef !== 'string') {
+  if (typeof record['projectRef'] !== 'string') {
     return undefined
   }
-  const projectRef = record.projectRef.trim()
+  const projectRef = record['projectRef'].trim()
   if (!projectRef) {
     return undefined
   }
-  const profile = normalizeFavoriteProfile(record.profile)
-  const label = typeof record.label === 'string' ? record.label : undefined
-  const webUrl = typeof record.webUrl === 'string' ? record.webUrl : undefined
-  const lastActivity = typeof record.lastActivity === 'string' ? record.lastActivity : undefined
+  const profile = normalizeFavoriteProfile(record['profile'])
+  const label = typeof record['label'] === 'string' ? record['label'] : undefined
+  const webUrl = typeof record['webUrl'] === 'string' ? record['webUrl'] : undefined
+  const lastActivity = typeof record['lastActivity'] === 'string' ? record['lastActivity'] : undefined
+  const lastUsedAt = typeof record['lastUsedAt'] === 'string' ? record['lastUsedAt'] : undefined
 
-  return {
-    projectRef,
-    profile,
-    label,
-    webUrl,
-    lastActivity,
+  const normalized: FavoriteProjectRecord = { projectRef }
+  if (profile) {
+    normalized.profile = profile
   }
+  if (label) {
+    normalized.label = label
+  }
+  if (webUrl) {
+    normalized.webUrl = webUrl
+  }
+  if (lastActivity) {
+    normalized.lastActivity = lastActivity
+  }
+  if (lastUsedAt) {
+    normalized.lastUsedAt = lastUsedAt
+  }
+  return normalized
 }
 
 export async function loadFavoriteProjects(): Promise<FavoriteProjectRecord[]> {

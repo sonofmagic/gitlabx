@@ -44,7 +44,8 @@ export function registerListCommand(program: Command) {
             }
           }))
           // Backward-compatible JSON: if single profile, print the MR array directly.
-          const payload = results.length === 1 ? results[0].mergeRequests : results
+          const first = results[0]
+          const payload = results.length === 1 && first ? first.mergeRequests : results
           process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`)
           return
         }

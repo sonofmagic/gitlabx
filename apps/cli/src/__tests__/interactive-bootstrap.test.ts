@@ -11,8 +11,8 @@ function setupTempHome() {
     mkdirSync(base, { recursive: true })
   }
   const dir = mkdtempSync(path.join(base, 'home-'))
-  process.env.HOME = dir
-  process.env.XDG_CONFIG_HOME = path.join(dir, '.config')
+  process.env['HOME'] = dir
+  process.env['XDG_CONFIG_HOME'] = path.join(dir, '.config')
   return dir
 }
 
@@ -40,7 +40,7 @@ describe('interactive bootstrap', () => {
       confirm: async () => false,
     }))
     // Make input appear TTY
-    process.env.CI = ''
+    process.env['CI'] = ''
     vi.doMock('node:process', () => ({
       stdin: { isTTY: true },
       stdout: { write: (_: string) => {} },

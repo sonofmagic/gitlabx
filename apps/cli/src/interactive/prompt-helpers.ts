@@ -14,7 +14,7 @@ export interface PromptRunResult<T> {
   value?: T
 }
 
-export async function runPromptWithEsc<T, O extends Record<string, any>>(
+export async function runPromptWithEsc<T, O extends Record<string, unknown>>(
   fn: (options: O) => Promise<T>,
   options: O,
 ): Promise<PromptRunResult<T>> {
@@ -22,9 +22,11 @@ export async function runPromptWithEsc<T, O extends Record<string, any>>(
   readline.emitKeypressEvents(stdin)
   const controller = new AbortController()
   const wasRaw = Boolean(stdin.isRaw)
+  let escaped = false
 
   const onKeypress = (_chunk: string, key?: readline.Key) => {
     if (key?.name === 'escape') {
+      escaped = true
       controller.abort()
     }
   }
@@ -39,13 +41,18 @@ export async function runPromptWithEsc<T, O extends Record<string, any>>(
       ...options,
       signal: controller.signal,
     })
+    if (escaped) {
+      return {
+        cancelled: true,
+      }
+    }
     return {
       cancelled: false,
       value,
     }
   }
   catch (error) {
-    if (controller.signal.aborted) {
+    if (controller.signal.aborted || escaped) {
       return {
         cancelled: true,
       }
@@ -99,7 +106,7 @@ export async function selectFromPagedList<T>(
     const result = await runPromptWithEsc(promptSelect, {
       message: title,
       choices,
-      default: choices.length > 0 ? choices[0].value : -1,
+      default: choices.at(0)?.value ?? -1,
       loop: false,
     })
     if (result.cancelled || result.value === -1) {
@@ -153,7 +160,11 @@ export async function selectFromPagedList<T>(
       const start = pageIndex * pageSize
       const end = Math.min(start + pageSize, items.length)
       for (let idx = start; idx < end; idx++) {
-        const entryLines = renderLines(items[idx], idx)
+        const item = items[idx]
+        if (!item) {
+          continue
+        }
+        const entryLines = renderLines(item, idx)
         const isSelected = idx === selectionIndex
         entryLines.forEach((line, lineIdx) => {
           const pointer = lineIdx === 0 ? (isSelected ? pc.cyan('▸') : pc.dim('•')) : ' '
@@ -297,13 +308,16 @@ export async function promptProjectSelection(
   const helpText = options?.onToggleFavorite
     ? `${PAGER_HELP_TEXT}  ·  ${pc.yellow('★')} toggle favorite (${pc.cyan('f')})`
     : `${PAGER_HELP_TEXT}`
-  return await selectFromPagedList(projects, {
+  const selectOptions: PagedSelectOptions<InteractiveProjectChoice> = {
     title: 'Select a project',
     pageSize: DEFAULT_PAGE_SIZE,
     formatItem: (choice, idx) => formatProjectLine(choice, idx),
     helpText,
-    onToggleFavorite: options?.onToggleFavorite,
-  })
+  }
+  if (options?.onToggleFavorite) {
+    selectOptions.onToggleFavorite = options.onToggleFavorite
+  }
+  return await selectFromPagedList(projects, selectOptions)
 }
 
 export async function promptRepoListMode(

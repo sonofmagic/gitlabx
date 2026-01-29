@@ -15,6 +15,7 @@ import {
   buildProjectOptions,
 
   markFavoriteState,
+  sortFavoriteRecords,
 
 } from './interactive/helpers'
 import { launchProfileManager } from './interactive/profile-manager'
@@ -102,13 +103,20 @@ async function collectRecentProjects(profileName?: string): Promise<InteractiveP
         if (!projectRef || !label) {
           return
         }
-        choices.push({
+        const choice: InteractiveProjectChoice = {
           projectRef,
           label,
-          lastActivity: project.last_activity_at ?? undefined,
-          profileName: name,
-          webUrl: project.web_url ?? undefined,
-        })
+        }
+        if (project.last_activity_at) {
+          choice.lastActivity = project.last_activity_at
+        }
+        if (name) {
+          choice.profileName = name
+        }
+        if (project.web_url) {
+          choice.webUrl = project.web_url
+        }
+        choices.push(choice)
       })
     }
     catch (error) {
@@ -217,9 +225,10 @@ function applyFavoriteState(
   projects: InteractiveProjectChoice[],
   favoriteRecords: FavoriteProjectRecord[],
 ) {
-  const favoriteSet = new Set(favoriteRecords.map(record => favoriteKey(record.projectRef, record.profile)))
+  const sortedFavorites = sortFavoriteRecords(favoriteRecords)
+  const favoriteSet = new Set(sortedFavorites.map(record => favoriteKey(record.projectRef, record.profile)))
   markFavoriteState(projects, favoriteSet)
-  const favoriteChoices = buildFavoriteChoiceList(favoriteRecords, projects)
+  const favoriteChoices = buildFavoriteChoiceList(sortedFavorites, projects)
   return { favoriteSet, favoriteChoices }
 }
 
@@ -296,17 +305,64 @@ export async function launchInteractiveHome() {
     }
     else {
       const filtered = favoriteRecords.filter(record => favoriteKey(record.projectRef, record.profile) !== key)
-      filtered.push({
+      const record: FavoriteProjectRecord = {
         projectRef: choice.projectRef,
-        profile: choice.profileName,
-        label: choice.label,
-        webUrl: choice.webUrl,
-        lastActivity: choice.lastActivity,
-      })
+      }
+      if (choice.profileName) {
+        record.profile = choice.profileName
+      }
+      if (choice.label) {
+        record.label = choice.label
+      }
+      if (choice.webUrl) {
+        record.webUrl = choice.webUrl
+      }
+      if (choice.lastActivity) {
+        record.lastActivity = choice.lastActivity
+      }
+      filtered.push(record)
       await persistFavorites(filtered)
       logger.info(pc.dim(`Added ${choice.label} to favorites.`))
     }
     choice.isFavorite = !isFavorite
+  }
+
+  const markFavoriteUsed = async (choice: InteractiveProjectChoice) => {
+    if (!choice.isFavorite) {
+      return
+    }
+    const key = favoriteKey(choice.projectRef, choice.profileName)
+    if (!favoriteSet.has(key)) {
+      return
+    }
+    const usedAt = new Date().toISOString()
+    let updated = false
+    const nextRecords = favoriteRecords.map((record) => {
+      if (favoriteKey(record.projectRef, record.profile) !== key) {
+        return record
+      }
+      const updatedRecord: FavoriteProjectRecord = {
+        projectRef: record.projectRef,
+      }
+      if (record.profile) {
+        updatedRecord.profile = record.profile
+      }
+      if (record.label) {
+        updatedRecord.label = record.label
+      }
+      if (record.webUrl) {
+        updatedRecord.webUrl = record.webUrl
+      }
+      if (record.lastActivity) {
+        updatedRecord.lastActivity = record.lastActivity
+      }
+      updatedRecord.lastUsedAt = usedAt
+      updated = true
+      return updatedRecord
+    })
+    if (updated) {
+      await persistFavorites(nextRecords)
+    }
   }
 
   while (true) {
@@ -321,12 +377,15 @@ export async function launchInteractiveHome() {
     }
 
     if (mode === 'profiles') {
-      await launchProfileManager({
-        activeProfile: activeProfileName,
+      const profileOptions: Parameters<typeof launchProfileManager>[0] = {
         onActiveProfileChange: (name) => {
           activeProfileName = name
         },
-      })
+      }
+      if (activeProfileName) {
+        profileOptions.activeProfile = activeProfileName
+      }
+      await launchProfileManager(profileOptions)
       await refreshProfileState()
       await refreshProjects()
       continue
@@ -383,6 +442,8 @@ export async function launchInteractiveHome() {
         logger.info(pc.dim('Action cancelled. Returning to menu...'))
         continue
       }
+
+      await markFavoriteUsed(selection)
 
       const profileLabel = selection.profileName ? `profile ${selection.profileName}` : 'default profile'
       const iidLabel = typeof mergeRequest.iid === 'number' ? `!${mergeRequest.iid}` : 'merge request'
