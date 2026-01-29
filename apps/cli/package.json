@@ -51,8 +51,8 @@
   "publishConfig": {},
   "dependencies": {
     "@gitbeaker/rest": "^43.8.0",
-    "@inquirer/prompts": "^8.0.1",
-    "c12": "^3.3.1",
+    "@inquirer/prompts": "^8.2.0",
+    "c12": "^3.3.3",
     "commander": "^14.0.0",
     "picocolors": "^1.1.0"
   }
