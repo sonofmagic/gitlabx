@@ -63,6 +63,58 @@ packages/
 | `pnpm script:sync`            | 对齐依赖与脚本版本。                          |
 | `pnpm script:clean`           | 清理示例包及生成产物。                        |
 
+## 本地使用 @gitlabx/cli（link 与 workspace）
+
+### 使用 pnpm link（跨仓库或外部项目）
+
+1. 在本仓库先构建一次：
+
+```bash
+pnpm -C apps/cli build
+```
+
+2. 注册到全局链接区：
+
+```bash
+pnpm -C apps/cli link --global
+```
+
+3. 在目标项目中使用链接：
+
+```bash
+pnpm link --global @gitlabx/cli
+```
+
+完成后可直接使用 CLI（如 `gbx -v`），或在代码中导入：
+
+```ts
+import { createProgram, runCli } from '@gitlabx/cli'
+```
+
+**更新机制**：`pnpm link` 只建立符号链接，不会自动构建。源码变更后需要重新 `build`，或一直运行 `pnpm -C apps/cli dev`（watch 构建）。只要链接存在且包名/bin 未变，**无需重复 link**。
+
+### 同仓库使用（推荐 workspace:\*）
+
+如果你的目标项目就在本仓库内，建议直接使用 workspace 依赖，避免 link：
+
+1. 在目标包 `package.json` 中添加依赖：
+
+```json
+{
+  "dependencies": {
+    "@gitlabx/cli": "workspace:*"
+  }
+}
+```
+
+2. 重新安装依赖：
+
+```bash
+pnpm install
+```
+
+这样会自动使用本地源码包。若依赖的是 `dist` 产物，仍需 `pnpm -C apps/cli build` 或 `pnpm -C apps/cli dev` 来持续更新。
+
 ## 模板使用流程
 
 - 在 GitHub 仓库页点击 “Use this template”，或克隆后重置远程地址。
